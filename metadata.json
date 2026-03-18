@@ -1,0 +1,5 @@
+{
+  "name": "Agent Builder",
+  "description": "A drag-and-drop React Flow application to build and simulate agent workflows.",
+  "requestFramePermissions": []
+}
