@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, Bot, User, RefreshCw, AlertCircle, Terminal, Sparkles, Trash2, LayoutGrid, Command, ChevronRight } from 'lucide-react';
+import { Send, Bot, User, RefreshCw, AlertCircle, Terminal, Sparkles, Trash2, LayoutGrid, Command, ChevronRight, Zap } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { workflowService } from '../services/workflowService';
 import { WorkflowExecutor, ExecutionContext } from '../services/workflowExecutor';
+import FAQModal from './FAQModal';
+import { faqService } from '../services/faqService';
 
 /**
  * Utility for Tailwind classes
@@ -20,7 +22,7 @@ interface Message {
   isStreaming?: boolean;
 }
 
-const WS_URL = `${window.location.protocol === 'https:' ? 'ws:' : 'ws:'}//${window.location.host}/ws-proxy`;
+const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws-proxy`;
 
 interface WebSocketChatProps {
   onNavigateToWorkflows: () => void;
@@ -33,11 +35,19 @@ export default function WebSocketChat({ onNavigateToWorkflows }: WebSocketChatPr
   const [isTyping, setIsTyping] = useState(false);
   const [showCommands, setShowCommands] = useState(false);
   const [commands, setCommands] = useState<{name: string, description: string, isWorkflow?: boolean, workflowId?: string}[]>([]);
+  const [isFaqModalOpen, setIsFaqModalOpen] = useState(false);
+  const [isOptimizeEnabled, setIsOptimizeEnabled] = useState(() => {
+    return localStorage.getItem('chatbot_optimize_enabled') === 'true';
+  });
   
   const wsRef = useRef<WebSocket | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const executorRef = useRef<WorkflowExecutor | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('chatbot_optimize_enabled', String(isOptimizeEnabled));
+  }, [isOptimizeEnabled]);
 
   useEffect(() => {
     const DEFAULT_COMMANDS = [
@@ -309,6 +319,22 @@ export default function WebSocketChat({ onNavigateToWorkflows }: WebSocketChatPr
       content: trimmedInput
     };
 
+    // Check FAQ if optimization is enabled
+    if (isOptimizeEnabled) {
+      const bestMatch = faqService.findBestMatch(trimmedInput);
+      if (bestMatch) {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'bot',
+          content: `⚡ **Trả lời nhanh:**\n\n${bestMatch.answer}`
+        };
+        setMessages(prev => [...prev, userMessage, botMessage]);
+        setInput('');
+        setShowCommands(false);
+        return;
+      }
+    }
+
     const botPlaceholder: Message = {
       id: (Date.now() + 1).toString(),
       role: 'bot',
@@ -358,6 +384,19 @@ export default function WebSocketChat({ onNavigateToWorkflows }: WebSocketChatPr
         </div>
         
         <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setIsFaqModalOpen(true)}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all text-sm font-medium",
+              isOptimizeEnabled 
+                ? "text-emerald-600 bg-emerald-50 hover:bg-emerald-100" 
+                : "text-gray-500 hover:text-indigo-600 hover:bg-indigo-50"
+            )}
+            title="Tối ưu câu trả lời"
+          >
+            <Zap size={18} className={isOptimizeEnabled ? "fill-emerald-600" : ""} />
+            <span className="hidden sm:inline">Tối ưu</span>
+          </button>
           <button 
             onClick={onNavigateToWorkflows}
             className="flex items-center gap-2 px-3 py-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all text-sm font-medium"
@@ -538,6 +577,13 @@ export default function WebSocketChat({ onNavigateToWorkflows }: WebSocketChatPr
           </p>
         </div>
       </footer>
+
+      <FAQModal 
+        isOpen={isFaqModalOpen} 
+        onClose={() => setIsFaqModalOpen(false)} 
+        isOptimizeEnabled={isOptimizeEnabled}
+        onToggleOptimize={setIsOptimizeEnabled}
+      />
     </div>
   );
 }
