@@ -22,7 +22,7 @@ interface Message {
   isStreaming?: boolean;
 }
 
-const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws-proxy`;
+const WS_URL = 'wss://aichatbot.gvbsoft.vn/ws';
 
 interface WebSocketChatProps {
   onNavigateToWorkflows: () => void;
