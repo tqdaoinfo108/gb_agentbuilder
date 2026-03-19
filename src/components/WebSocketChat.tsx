@@ -20,7 +20,7 @@ interface Message {
   isStreaming?: boolean;
 }
 
-const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws-proxy`;
+const WS_URL = `${window.location.protocol === 'https:' ? 'ws:' : 'ws:'}//${window.location.host}/ws-proxy`;
 
 interface WebSocketChatProps {
   onNavigateToWorkflows: () => void;
