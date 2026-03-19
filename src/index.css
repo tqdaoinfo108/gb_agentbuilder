@@ -1,43 +1,35 @@
 @import "tailwindcss";
 
-/* React Flow Handle Fixes */
-.react-flow__handle {
-  z-index: 1000 !important;
-  pointer-events: all !important;
-  cursor: crosshair !important;
-  width: 16px !important;
-  height: 16px !important;
-  border: 3px solid white !important;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
-  transition: all 0.2s ease-in-out !important;
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
-.react-flow__handle:hover {
-  transform: scale(1.4) !important;
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4) !important;
+body {
+  @apply antialiased text-gray-900;
 }
 
-.react-flow__handle-connecting {
-  animation: pulse 1s infinite;
+/* Custom scrollbar for a cleaner look */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-@keyframes pulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 114, 0.7); }
-  70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(255, 0, 114, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 114, 0); }
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.react-flow__edge.selected .react-flow__edge-path {
-  stroke: #f43f5e !important;
-  stroke-width: 4 !important;
-  filter: drop-shadow(0 0 5px rgba(244, 63, 94, 0.4)) !important;
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-200 rounded-full hover:bg-gray-300 transition-colors;
 }
 
-.react-flow__edge-path {
-  transition: stroke-width 0.2s, stroke 0.2s !important;
+/* Markdown styling overrides */
+.prose pre {
+  @apply rounded-xl border border-gray-800 shadow-lg my-4;
 }
 
-.react-flow__edge:hover .react-flow__edge-path {
-  stroke-width: 4 !important;
-  stroke: #6366f1 !important;
+.prose code {
+  @apply bg-gray-100 text-indigo-600 px-1.5 py-0.5 rounded-md font-mono text-[0.9em] before:content-none after:content-none;
+}
+
+.prose p {
+  @apply mb-4 last:mb-0;
 }
