@@ -1,5 +1,5 @@
 {
-  "name": "Agent Builder",
-  "description": "A drag-and-drop React Flow application to build and simulate agent workflows.",
+  "name": "IT Agent Manager",
+  "description": "Real-time IT infrastructure management dashboard with AI command integration.",
   "requestFramePermissions": []
 }
